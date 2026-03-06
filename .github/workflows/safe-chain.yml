@@ -27,5 +27,8 @@ jobs:
       - name: Run safe-chain
         run: safe-chain setup-ci
 
+      - name: Verify safe-chain
+        run: pnpm safe-chain verify
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --safe-chain-logging=verbose
