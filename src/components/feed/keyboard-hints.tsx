@@ -1,5 +1,3 @@
-"use client";
-
 import { Kbd } from "@/components/ui/kbd";
 
 export function KeyboardHints() {

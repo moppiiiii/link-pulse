@@ -1,5 +1,3 @@
-"use client";
-
 import { Inbox } from "lucide-react";
 import type { Article } from "@/lib/types";
 import { ArticleCard } from "./article-card";
