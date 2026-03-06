@@ -1,0 +1,17 @@
+pre-push:
+  jobs:
+    - name: packages audit
+      tags:
+        - frontend
+        - security
+      run: pnpm audit
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: Biome Check Fix
+      run: pnpm run fix:check --staged --no-errors-on-unmatched --files-ignore-unknown=true && git update-index --again
+
+    # - name: Type Check
+    #   run: npx tsc --noEmit
+    #   glob: "*.{js,ts,jsx,tsx}"
