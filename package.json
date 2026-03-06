@@ -2,6 +2,7 @@
   "name": "link-pulse",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.30.0",
   "imports": {
     "#/*": "./src/*"
   },
@@ -13,7 +14,7 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "fix:check": "biome check --fix",
+    "fix:check": "biome check --write",
     "deploy": "pnpm run build && wrangler deploy",
     "knip": "knip"
   },
