@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useState } from "react";
 import { useFeedStore } from "@/hooks/use-feed-store";
 import { ArticleList } from "./article-list";
