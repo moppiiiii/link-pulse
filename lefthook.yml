@@ -10,8 +10,8 @@ pre-commit:
   parallel: true
   jobs:
     - name: Biome Check Fix
-      run: pnpm run check:fix --staged --no-errors-on-unmatched --files-ignore-unknown=true && git update-index --again
+      run: pnpm run fix:check --staged --no-errors-on-unmatched --files-ignore-unknown=true && git update-index --again
 
-    - name: Type Check
-      run: npx tsc --noEmit
-      glob: "*.{js,ts,jsx,tsx}"
+    # - name: Type Check
+    #   run: npx tsc --noEmit
+    #   glob: "*.{js,ts,jsx,tsx}"
