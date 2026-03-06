@@ -13,6 +13,7 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
+    "fix:check": "biome check --fix",
     "deploy": "pnpm run build && wrangler deploy",
     "knip": "knip"
   },
@@ -50,6 +51,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "jsdom": "^27.0.0",
     "knip": "^5.85.0",
+    "lefthook": "^2.1.2",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
     "vite-tsconfig-paths": "^5.1.4",
