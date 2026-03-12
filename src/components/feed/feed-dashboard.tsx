@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import type { Article } from "#/lib/types";
 import { useFeedStore } from "@/hooks/use-feed-store";
 import { ArticleList } from "./article-list";
 import { FilterBar } from "./filter-bar";
@@ -6,10 +7,13 @@ import { Header } from "./header";
 import { KeyboardHints } from "./keyboard-hints";
 import { SettingsDialog } from "./settings-dialog";
 
-export function FeedDashboard() {
+export interface FeedDashboardProps {
+  articles: Article[];
+}
+
+export function FeedDashboard({ articles }: FeedDashboardProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const {
-    articles,
     categories,
     sources,
     enabledCategories,
