@@ -9,8 +9,8 @@ import type { Article, Category, FeedSource } from "@/lib/types";
 export type ViewMode = "all" | "unread" | "favorites";
 export type SortMode = "newest" | "oldest";
 
-export function useFeedStore() {
-  const [articles, setArticles] = useState<Article[]>(mockArticles);
+export function useFeedStore(initialArticles: Article[] = mockArticles) {
+  const [articles, setArticles] = useState<Article[]>(initialArticles);
   const [categories, setCategories] = useState<Category[]>(defaultCategories);
   const [sources, setSources] = useState<FeedSource[]>(defaultSources);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
