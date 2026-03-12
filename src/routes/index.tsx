@@ -23,6 +23,5 @@ export const Route = createFileRoute("/")({
 
 function App() {
   const { articles } = Route.useLoaderData();
-  console.log(articles);
   return <FeedDashboard articles={articles} />;
 }
