@@ -49,5 +49,5 @@ export const articleAiSummariesRelations = relations(
       fields: [articleAiSummaries.articleId],
       references: [articles.id],
     }),
-  })
+  }),
 );

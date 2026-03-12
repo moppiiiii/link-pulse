@@ -1,8 +1,8 @@
-import { config } from 'dotenv';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { config } from "dotenv";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
-config({ path: '.env.local' });
+config({ path: ".env.local" });
 
 const client = postgres(import.meta.env.VITE_SUPABASE_URL);
 export const db = drizzle({ client });
