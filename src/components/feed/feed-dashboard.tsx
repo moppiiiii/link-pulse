@@ -11,9 +11,12 @@ export interface FeedDashboardProps {
   articles: Article[];
 }
 
-export function FeedDashboard({ articles }: FeedDashboardProps) {
+export function FeedDashboard({
+  articles: initialArticles,
+}: FeedDashboardProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const {
+    articles,
     categories,
     sources,
     enabledCategories,
@@ -32,7 +35,7 @@ export function FeedDashboard({ articles }: FeedDashboardProps) {
     toggleCategoryEnabled,
     toggleSourceEnabled,
     refreshFeed,
-  } = useFeedStore();
+  } = useFeedStore(initialArticles);
 
   // Keyboard shortcuts
   const handleKeyDown = useCallback(
