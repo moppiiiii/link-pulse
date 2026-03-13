@@ -2,8 +2,8 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import NotFound from "@/components/not-found/not-found";
+import { getServerUser } from "@/utils/auth-server-fn";
 import { supabase } from "@/utils/supabase";
-import { createSupabaseServerClient } from "@/utils/supabase-server";
 import StoreDevtools from "../lib/demo-store-devtools";
 import appCss from "../styles.css?url";
 
@@ -11,10 +11,7 @@ export const Route = createRootRoute({
   beforeLoad: async () => {
     if (typeof window === "undefined") {
       // サーバー: Cookie からセッションを読む
-      const serverClient = createSupabaseServerClient();
-      const {
-        data: { user },
-      } = await serverClient.auth.getUser();
+      const user = await getServerUser();
       return { auth: user };
     }
     // クライアント: ブラウザの Cookie からセッションを読む
