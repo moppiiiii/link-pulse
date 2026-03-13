@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Article } from "#/lib/types";
+import type { Article, Category } from "#/lib/types";
 import { useFeedStore } from "@/hooks/use-feed-store";
 import { ArticleList } from "./article-list";
 import { FilterBar } from "./filter-bar";
@@ -9,16 +9,19 @@ import { SettingsDialog } from "./settings-dialog";
 
 export interface FeedDashboardProps {
   articles: Article[];
+  categories: Category[];
+  onLogout: () => void;
 }
 
 export function FeedDashboard({
   articles: initialArticles,
+  categories: initialCategories,
+  onLogout,
 }: FeedDashboardProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const {
     articles,
     categories,
-    sources,
     enabledCategories,
     selectedCategory,
     viewMode,
@@ -33,9 +36,8 @@ export function FeedDashboard({
     toggleFavorite,
     markAsRead,
     toggleCategoryEnabled,
-    toggleSourceEnabled,
     refreshFeed,
-  } = useFeedStore(initialArticles);
+  } = useFeedStore(initialArticles, initialCategories);
 
   // Keyboard shortcuts
   const handleKeyDown = useCallback(
@@ -109,6 +111,7 @@ export function FeedDashboard({
         onSearchChange={setSearchQuery}
         onRefresh={refreshFeed}
         onSettingsClick={() => setSettingsOpen(true)}
+        onLogout={onLogout}
         isRefreshing={isRefreshing}
         stats={stats}
       />
@@ -140,9 +143,7 @@ export function FeedDashboard({
         isOpen={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         categories={categories}
-        sources={sources}
         onToggleCategory={toggleCategoryEnabled}
-        onToggleSource={toggleSourceEnabled}
       />
     </div>
   );
