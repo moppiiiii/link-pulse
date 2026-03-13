@@ -1,18 +1,16 @@
 import { useCallback, useMemo, useState } from "react";
-import {
-  defaultCategories,
-  defaultSources,
-  mockArticles,
-} from "@/lib/mock-data";
-import type { Article, Category, FeedSource } from "@/lib/types";
+import { $supabase } from "@/lib/supabase";
+import type { Article, Category } from "@/lib/types";
 
 export type ViewMode = "all" | "unread" | "favorites";
 export type SortMode = "newest" | "oldest";
 
-export function useFeedStore(initialArticles: Article[] = mockArticles) {
+export function useFeedStore(
+  initialArticles: Article[],
+  initialCategories: Category[],
+) {
   const [articles, setArticles] = useState<Article[]>(initialArticles);
-  const [categories, setCategories] = useState<Category[]>(defaultCategories);
-  const [sources, setSources] = useState<FeedSource[]>(defaultSources);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [viewMode, setViewMode] = useState<ViewMode>("all");
   const [sortMode, setSortMode] = useState<SortMode>("newest");
@@ -20,61 +18,92 @@ export function useFeedStore(initialArticles: Article[] = mockArticles) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const toggleFavorite = useCallback((articleId: string) => {
-    setArticles((prev) =>
-      prev.map((article) =>
-        article.id === articleId
-          ? { ...article, isFavorite: !article.isFavorite }
-          : article,
-      ),
-    );
+    // Optimistic update
+    setArticles((prev) => {
+      const article = prev.find((a) => a.id === articleId);
+      if (!article) return prev;
+      const nextValue = !article.isFavorite;
+
+      // Persist to Supabase (fire-and-forget)
+      $supabase("@update/articles", {
+        data: { is_favorite: nextValue },
+        match: { id: articleId },
+      }).then((result) => {
+        result.mapErr((error) => {
+          console.error("Failed to update favorite:", error.message);
+          // Revert optimistic update on failure
+          setArticles((current) =>
+            current.map((a) =>
+              a.id === articleId ? { ...a, isFavorite: article.isFavorite } : a,
+            ),
+          );
+        });
+      });
+
+      return prev.map((a) =>
+        a.id === articleId ? { ...a, isFavorite: nextValue } : a,
+      );
+    });
   }, []);
 
   const markAsRead = useCallback((articleId: string) => {
-    setArticles((prev) =>
-      prev.map((article) =>
-        article.id === articleId ? { ...article, isRead: true } : article,
-      ),
-    );
+    // Optimistic update
+    setArticles((prev) => {
+      const article = prev.find((a) => a.id === articleId);
+      if (!article || article.isRead) return prev;
+
+      // Persist to Supabase (fire-and-forget)
+      $supabase("@update/articles", {
+        data: { is_read: true },
+        match: { id: articleId },
+      }).then((result) => {
+        result.mapErr((error) => {
+          console.error("Failed to mark as read:", error.message);
+          // Revert optimistic update on failure
+          setArticles((current) =>
+            current.map((a) =>
+              a.id === articleId ? { ...a, isRead: false } : a,
+            ),
+          );
+        });
+      });
+
+      return prev.map((a) => (a.id === articleId ? { ...a, isRead: true } : a));
+    });
   }, []);
 
   const toggleCategoryEnabled = useCallback((categoryId: string) => {
-    setCategories((prev) =>
-      prev.map((cat) =>
-        cat.id === categoryId ? { ...cat, enabled: !cat.enabled } : cat,
-      ),
-    );
-  }, []);
+    setCategories((prev) => {
+      const category = prev.find((c) => c.id === categoryId);
+      if (!category) return prev;
+      const nextValue = !category.enabled;
 
-  const toggleSourceEnabled = useCallback((sourceId: string) => {
-    setSources((prev) =>
-      prev.map((source) =>
-        source.id === sourceId
-          ? { ...source, enabled: !source.enabled }
-          : source,
-      ),
-    );
+      // Persist to Supabase (fire-and-forget)
+      $supabase("@update/categories", {
+        data: { enabled: nextValue },
+        match: { id: categoryId },
+      }).then((result) => {
+        result.mapErr((error) => {
+          console.error("Failed to update category:", error.message);
+          // Revert optimistic update on failure
+          setCategories((current) =>
+            current.map((c) =>
+              c.id === categoryId ? { ...c, enabled: category.enabled } : c,
+            ),
+          );
+        });
+      });
+
+      return prev.map((c) =>
+        c.id === categoryId ? { ...c, enabled: nextValue } : c,
+      );
+    });
   }, []);
 
   const refreshFeed = useCallback(async () => {
     setIsRefreshing(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    // In a real app, this would fetch new articles from RSS feeds
-    setArticles((prev) => {
-      const newArticle: Article = {
-        id: `new-${Date.now()}`,
-        title: "Breaking: New Framework Released with Revolutionary Features",
-        description:
-          "A new JavaScript framework has just been released, promising to solve all the problems you never knew you had.",
-        url: "https://example.com/new-framework",
-        source: "Hacker News",
-        publishedAt: new Date().toISOString(),
-        category: "frontend",
-        isFavorite: false,
-        isRead: false,
-      };
-      return [newArticle, ...prev];
-    });
+    const result = await $supabase("@select/articles", undefined);
+    result.map((articles) => setArticles(articles));
     setIsRefreshing(false);
   }, []);
 
@@ -143,7 +172,6 @@ export function useFeedStore(initialArticles: Article[] = mockArticles) {
   return {
     articles: filteredArticles,
     categories,
-    sources,
     enabledCategories,
     selectedCategory,
     viewMode,
@@ -158,7 +186,6 @@ export function useFeedStore(initialArticles: Article[] = mockArticles) {
     toggleFavorite,
     markAsRead,
     toggleCategoryEnabled,
-    toggleSourceEnabled,
     refreshFeed,
   };
 }
