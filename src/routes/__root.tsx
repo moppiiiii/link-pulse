@@ -2,10 +2,27 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import NotFound from "@/components/not-found/not-found";
+import { supabase } from "@/utils/supabase";
+import { createSupabaseServerClient } from "@/utils/supabase-server";
 import StoreDevtools from "../lib/demo-store-devtools";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
+  beforeLoad: async () => {
+    if (typeof window === "undefined") {
+      // サーバー: Cookie からセッションを読む
+      const serverClient = createSupabaseServerClient();
+      const {
+        data: { user },
+      } = await serverClient.auth.getUser();
+      return { auth: user };
+    }
+    // クライアント: ブラウザの Cookie からセッションを読む
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    return { auth: session?.user ?? null };
+  },
   head: () => ({
     meta: [
       {
@@ -16,7 +33,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "LinkPulse",
       },
     ],
     links: [
