@@ -23,10 +23,18 @@ export function SettingsDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 animate-in fade-in duration-200 md:items-center md:pt-0">
-      <div
+      <button
+        type="button"
         className="fixed inset-0 bg-background/80 backdrop-blur-sm"
         onClick={onClose}
-      />
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            onClose();
+          }
+        }}
+      >
+        <span className="sr-only">Close</span>
+      </button>
       <div className="relative z-50 w-full max-w-lg rounded-lg border border-border bg-card shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-200 md:max-h-[85vh] md:slide-in-from-bottom-0 md:zoom-in-95">
         <div className="flex items-center justify-between border-b border-border p-4">
           <div>
