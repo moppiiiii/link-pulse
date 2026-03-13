@@ -1,4 +1,4 @@
-import { RefreshCw, Rss, Search, Settings } from "lucide-react";
+import { LogOut, RefreshCw, Rss, Search, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
@@ -9,6 +9,7 @@ interface HeaderProps {
   onSearchChange: (query: string) => void;
   onRefresh: () => void;
   onSettingsClick: () => void;
+  onLogout: () => void;
   isRefreshing: boolean;
   stats: {
     total: number;
@@ -22,6 +23,7 @@ export function Header({
   onSearchChange,
   onRefresh,
   onSettingsClick,
+  onLogout,
   isRefreshing,
   stats,
 }: HeaderProps) {
@@ -84,6 +86,16 @@ export function Header({
           >
             <Settings className="h-4 w-4" />
             <span className="sr-only">Settings</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onLogout}
+            className="h-9 w-9"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="sr-only">Log out</span>
           </Button>
         </div>
       </div>
