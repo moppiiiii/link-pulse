@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { FeedDashboard } from "@/components/feed/feed-dashboard";
-import { supabase } from "@/utils/supabase";
 import { fetchIndexData } from "@/utils/index-server-fn";
+import { supabase } from "@/utils/supabase";
 
 export const Route = createFileRoute("/")({
   beforeLoad: ({ context }) => {
