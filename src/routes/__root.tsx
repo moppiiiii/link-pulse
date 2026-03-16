@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react";
 import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 import NotFound from "@/components/not-found/not-found";
 import { getServerUser } from "@/utils/auth-server-fn";
 import { supabase } from "@/utils/supabase";
@@ -14,10 +14,15 @@ const DevTools = import.meta.env.DEV
         default: () => (
           <TanStackDevtools
             config={{ position: "bottom-right" }}
-            plugins={[{ name: "Tanstack Router", render: <TanStackRouterDevtoolsPanel /> }]}
+            plugins={[
+              {
+                name: "Tanstack Router",
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
           />
         ),
-      }))
+      })),
     )
   : null;
 
