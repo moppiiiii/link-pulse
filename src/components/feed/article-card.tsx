@@ -1,4 +1,5 @@
 import { Clock, ExternalLink, Star } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Article } from "@/lib/types";
@@ -44,6 +45,12 @@ export function ArticleCard({
   onFavoriteToggle,
   onMarkAsRead,
 }: ArticleCardProps) {
+  const [relativeTime, setRelativeTime] = useState<string>("");
+
+  useEffect(() => {
+    setRelativeTime(formatRelativeTime(article.publishedAt));
+  }, [article.publishedAt]);
+
   const handleClick = () => {
     onMarkAsRead(article.id);
     window.open(article.url, "_blank", "noopener,noreferrer");
@@ -74,7 +81,7 @@ export function ArticleCard({
             </span>
             <span className="flex items-center text-xs text-muted-foreground">
               <Clock className="mr-1 h-3 w-3" />
-              {formatRelativeTime(article.publishedAt)}
+              {relativeTime}
             </span>
             {!article.isRead && (
               <span className="flex h-2 w-2 rounded-full bg-primary" />
