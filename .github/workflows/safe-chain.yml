@@ -1,0 +1,34 @@
+name: Safe Chain
+
+on:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ./.node-version
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install safe-chain
+        run: npm i -g @aikidosec/safe-chain
+
+      - name: Run safe-chain
+        run: safe-chain setup-ci
+
+      - name: Verify safe-chain
+        run: pnpm safe-chain-verify
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --safe-chain-logging=verbose

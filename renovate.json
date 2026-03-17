@@ -1,0 +1,73 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended"],
+    "dependencyDashboard": false,
+    "automerge": false,
+    "baseBranches": ["develop"],
+    "packageRules": [
+      {
+        "groupName": "Vite",
+        "matchPackageNames": [
+          "vite",
+          "@vitejs/**",
+          "vite-tsconfig-paths"
+        ]
+      },
+      {
+        "groupName": "Cloudflare",
+        "matchPackageNames": [
+          "@cloudflare/vite-plugin",
+          "wrangler"
+        ]
+      },
+      {
+        "groupName": "React",
+        "matchPackageNames": [
+          "react",
+          "react-dom",
+          "@types/react",
+          "@types/react-dom"
+        ]
+      },
+      {
+        "groupName": "TanStack",
+        "matchPackageNames": ["@tanstack/**"]
+      },
+
+      {
+        "groupName": "Tailwind CSS",
+        "matchPackageNames": [
+          "tailwindcss",
+          "@tailwindcss/**",
+          "class-variance-authority",
+          "clsx",
+          "tailwind-merge",
+          "tw-animate-css"
+        ]
+      },
+      {
+        "groupName": "UI",
+        "matchPackageNames": ["lucide-react"]
+      },
+      {
+        "groupName": "Auth",
+        "matchPackageNames": ["better-auth"]
+      },
+      {
+        "groupName": "TypeScript",
+        "matchPackageNames": ["typescript", "@types/node"]
+      },
+      {
+        "groupName": "Biome",
+        "matchPackageNames": ["@biomejs/**"]
+      },
+      {
+        "groupName": "Testing",
+        "matchPackageNames": [
+          "@testing-library/**",
+          "vitest",
+          "jsdom"
+        ]
+      }
+    ]
+  }
