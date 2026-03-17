@@ -15,7 +15,7 @@
     "lint": "biome lint",
     "check": "biome check",
     "fix:check": "biome check --write",
-    "deploy": "pnpm run build && wrangler deploy",
+    "deploy": "wrangler deploy",
     "knip": "knip"
   },
   "dependencies": {
