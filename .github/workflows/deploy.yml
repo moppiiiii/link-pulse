@@ -1,11 +1,14 @@
-name: "PR Check"
+name: Deploy
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
-  pr-check:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -22,12 +25,13 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Run Biome Check
-        run: pnpm run check
-
-      - name: Run Build
+      - name: Build
         run: pnpm run build
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
+      - name: Deploy to Cloudflare Workers
+        run: pnpm exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
