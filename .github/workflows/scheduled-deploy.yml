@@ -1,0 +1,51 @@
+name: Scheduled Deploy
+
+on:
+  schedule:
+    - cron: "0 21 * * 6" # Every Sunday 6:00 AM JST (Saturday 21:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      skipped: ${{ steps.check.outputs.skipped }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check for changes
+        id: check
+        run: |
+          git fetch origin develop
+          if git diff --quiet origin/main origin/develop; then
+            echo "skipped=true" >> $GITHUB_OUTPUT
+          else
+            echo "skipped=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create PR and merge
+        if: steps.check.outputs.skipped == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_URL=$(gh pr create \
+            --base main \
+            --head develop \
+            --title "chore: weekly scheduled deploy $(date +'%Y-%m-%d')" \
+            --body "Automated weekly merge from develop to main.")
+
+          gh pr merge "$PR_URL" --merge --auto
+
+  deploy:
+    needs: merge
+    if: needs.merge.outputs.skipped == 'false'
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
