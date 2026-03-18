@@ -6,23 +6,46 @@ on:
   workflow_dispatch:
 
 jobs:
-  merge-and-deploy:
+  merge:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      skipped: ${{ steps.check.outputs.skipped }}
 
     steps:
-      - name: Checkout main
+      - name: Checkout
         uses: actions/checkout@v6
         with:
           ref: main
-          token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
 
-      - name: Merge develop into main
+      - name: Check for changes
+        id: check
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin develop
-          git merge origin/develop --no-edit
+          if git diff --quiet origin/main origin/develop; then
+            echo "skipped=true" >> $GITHUB_OUTPUT
+          else
+            echo "skipped=false" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Push to main
-        run: git push origin main
+      - name: Create PR and merge
+        if: steps.check.outputs.skipped == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_URL=$(gh pr create \
+            --base main \
+            --head develop \
+            --title "chore: weekly scheduled deploy $(date +'%Y-%m-%d')" \
+            --body "Automated weekly merge from develop to main.")
+
+          gh pr merge "$PR_URL" --merge --auto
+
+  deploy:
+    needs: merge
+    if: needs.merge.outputs.skipped == 'false'
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
