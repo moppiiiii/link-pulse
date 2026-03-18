@@ -1,0 +1,28 @@
+name: Scheduled Deploy
+
+on:
+  schedule:
+    - cron: "0 21 * * 6" # Every Sunday 6:00 AM JST (Saturday 21:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  merge-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+
+      - name: Merge develop into main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin develop
+          git merge origin/develop --no-edit
+
+      - name: Push to main
+        run: git push origin main
