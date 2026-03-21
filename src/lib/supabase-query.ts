@@ -144,9 +144,8 @@ export type SupabaseSchemaMap = {
 };
 
 /** `SelectEntry<O>` の場合は `O`、それ以外のミューテーション操作は `void` を返す出力型ユーティリティ。 */
-type OutputOf<E, MutationOutput = void> = E extends SelectEntry<infer O>
-  ? O
-  : MutationOutput;
+type OutputOf<E, MutationOutput = void> =
+  E extends SelectEntry<infer O> ? O : MutationOutput;
 
 // `ReturnType<QueryBuilderType["select"]>` を使うと、PostgrestFilterBuilder の
 // Result 型パラメータは `"*"` デフォルト時の `unknown[]` になる。
@@ -176,26 +175,24 @@ type SelectBuilderType = ReturnType<QueryBuilderType["select"]>;
  */
 export type FilterFn = (query: SelectBuilderType) => SelectBuilderType;
 
-type OptionsFor<
-  K extends string,
-  S extends SupabaseSchemaMap,
-> = GetOp<K> extends "select"
-  ? { filter?: FilterFn } | undefined
-  : GetOp<K> extends "insert"
-    ? S[K & keyof S] extends InsertEntry<infer I>
-      ? { data: z.input<z.ZodType<I>> | Array<z.input<z.ZodType<I>>> }
-      : never
-    : GetOp<K> extends "update"
-      ? S[K & keyof S] extends UpdateEntry<infer I>
-        ? { data: z.input<z.ZodType<I>>; match: Record<string, unknown> }
+type OptionsFor<K extends string, S extends SupabaseSchemaMap> =
+  GetOp<K> extends "select"
+    ? { filter?: FilterFn } | undefined
+    : GetOp<K> extends "insert"
+      ? S[K & keyof S] extends InsertEntry<infer I>
+        ? { data: z.input<z.ZodType<I>> | Array<z.input<z.ZodType<I>>> }
         : never
-      : GetOp<K> extends "upsert"
-        ? S[K & keyof S] extends UpsertEntry<infer I>
-          ? { data: z.input<z.ZodType<I>> | Array<z.input<z.ZodType<I>>> }
+      : GetOp<K> extends "update"
+        ? S[K & keyof S] extends UpdateEntry<infer I>
+          ? { data: z.input<z.ZodType<I>>; match: Record<string, unknown> }
           : never
-        : GetOp<K> extends "delete"
-          ? { match: Record<string, unknown> }
-          : never;
+        : GetOp<K> extends "upsert"
+          ? S[K & keyof S] extends UpsertEntry<infer I>
+            ? { data: z.input<z.ZodType<I>> | Array<z.input<z.ZodType<I>>> }
+            : never
+          : GetOp<K> extends "delete"
+            ? { match: Record<string, unknown> }
+            : never;
 
 type SupabaseQueryFn<S extends SupabaseSchemaMap> = <
   K extends keyof S & OperationKey,
